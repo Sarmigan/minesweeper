@@ -1,19 +1,20 @@
 from enum import Enum
 from tkinter import *
+import pygame
 import time
 import random
 
-W_WIDTH = 1280
-W_HEIGHT = 720
+SCREEN_WIDTH = 1280
+SCREEN_HEIGHT = 720
 
 G_LENGTH = 600
 
-COL_SIZE = 10
-ROW_SIZE = 10
+COLUMNS, ROWS = 10, 10
 
 BOMB_COUNT = 5
 
 class TileType(Enum):
+    BOMB = "x"
     EMPTY = "0"
     ONE = "1"
     TWO = "2"
@@ -23,56 +24,63 @@ class TileType(Enum):
     SIX = "6"
     SEVEN = "7"
     EIGHT = "8"
-    BOMB = "x"
 
 class Tile:
-    def __init__(self, frame) -> None:
-        self.btn = Button(frame, width=int(G_LENGTH/COL_SIZE), height=int(G_LENGTH/ROW_SIZE), command=lambda : self.click_tile())
+    def __init__(self):
         self.tile_type = TileType.EMPTY
         self.is_hidden = True
 
-    def click_tile(self):
-        self.is_hidden = False
-        
-        self.btn.config(text=f"{self.tile_type.value}")
-        self.btn["state"] = DISABLED
-
 class Grid():
-    def __init__(self, col_size, row_size, grid_frame) -> None:
-        self.col_size = col_size
-        self.row_size = row_size
-        self.grid_frame = grid_frame
-        self.grid = []
-        
-        for i in range(row_size):
-            grid_frame.grid_rowconfigure(i, weight=1)
-        
-        for i in range(row_size):
-            grid_frame.grid_columnconfigure(i, weight=1)
-
-    def create_grid(self):
-
+    def __init__(self, columns, rows) -> None:
+        self.columns = columns
+        self.rows = rows
         self.grid = []
 
-        for i in range(self.row_size):
-            temp_row = []
-            for j in range(self.col_size):
-                temp_tile = Tile(self.grid_frame) 
-                temp_row.append(temp_tile)
-                temp_tile.btn.grid(row=i, column=j, sticky="nsew")
-            self.grid.append(temp_row)
+    def create_grid(self, mines):
+        self.grid = [[Tile() for i in range(self.columns)] for i in range(self.rows)]
+
+        mine_pos = []
+        while len(mine_pos) < mines:
+            rand_row = random.randrange(0, self.rows)
+            rand_column = random.randrange(0, self.columns)
+            rand_pos = rand_row, rand_column
+
+            if rand_pos in mines:
+                continue
+            else:
+                mine_pos.append(rand_pos)
+                self.grid[rand_row][rand_column] = TileType.BOMB
+
+    def get_neighbor_tiles(self, row, column):
+        neighbors = []
+        
+        if row > 0:                                                     # UP
+            neighbors.append(self.grid[row-1][column])
+        if row < self.rows-1:                                           # DOWN
+            neighbors.append(self.grid[row+1][column])
+        if column > 0:                                                  # LEFT
+            neighbors.append(self.grid[row][column-1])
+        if column < self.columns-1:                                     # RIGHT
+            neighbors.append(self.grid[row][column+1])
+        if row > 0 and column > 0:                                      # TOP LEFT
+            neighbors.append(self.grid[row-1][column-1])
+        if row < self.rows-1 and column < self.columns-1:               # TOP RIGHT
+            neighbors.append(self.grid[row+1][column+1])
+        if row < self.rows-1 and column > 0:                            # BOTTOM LEFT
+            neighbors.append(self.grid[row+1][column-1])
+        if row > 0 and column < self.columns-1:                         # BOTTOM RIGHT
+            neighbors.append(self.grid[row-1][column+1])
 
 if __name__ == "__main__":
-    root =  Tk()
-    root.geometry(f"{W_WIDTH}x{W_HEIGHT}")
-    root.title("Minesweeper")
-    root.resizable(False, False)
 
-    grid_frame = Frame(root, height=G_LENGTH, width=G_LENGTH, background="black")
-    grid_frame.place(relx=0.5, rely=0.5, anchor="center")
-    grid_frame.grid_propagate(False)
+    pygame.init()
 
-    grid = Grid(COL_SIZE, ROW_SIZE, grid_frame)
-    grid.create_grid()
+    root_window = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 
-    root.mainloop()
+    is_running = True
+    while is_running:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                is_running = False
+    
+    pygame.quit()
