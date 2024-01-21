@@ -105,12 +105,12 @@ if __name__ == "__main__":
     game_status, grid, ui = create_new_game()
     
     while is_running:
-        for event in pygame.event.get():
-            if grid.unhidden_tiles == (COLUMNS * ROWS) - MINE_COUNT:
-                game_status = GameStatus.WIN
-                ui.update_status(game_status)
-                grid.reveal_all_tiles()
+        if grid.unhidden_tiles == (COLUMNS * ROWS) - MINE_COUNT:
+            game_status = GameStatus.WIN
+            ui.update_status(game_status)
+            grid.reveal_all_tiles()
 
+        for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 is_running = False
 
@@ -118,7 +118,7 @@ if __name__ == "__main__":
                 mouse_x, mouse_y = pygame.mouse.get_pos()
 
                 if mouse_x > UI_POS_X + (UI_WIDTH/2 - SCALED_STATUS_SPRITE_SIZE/2) and mouse_y > UI_POS_Y + (UI_HEIGHT/2 - SCALED_STATUS_SPRITE_SIZE/2):
-                    if mouse_x < UI_POS_X + (UI_WIDTH/2 - SCALED_STATUS_SPRITE_SIZE/2) + SCALED_STATUS_SPRITE_SIZE and mouse_y < UI_POS_Y + (UI_HEIGHT/2 - SCALED_STATUS_SPRITE_SIZE/2) + GRID_HEIGHT:
+                    if mouse_x < UI_POS_X + (UI_WIDTH/2 - SCALED_STATUS_SPRITE_SIZE/2) + SCALED_STATUS_SPRITE_SIZE and mouse_y < UI_POS_Y + (UI_HEIGHT/2 - SCALED_STATUS_SPRITE_SIZE/2) + SCALED_STATUS_SPRITE_SIZE:
                         game_status, grid, ui = create_new_game()
 
                 if mouse_x > GRID_POS_X and mouse_y > GRID_POS_Y:
