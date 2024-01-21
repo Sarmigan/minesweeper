@@ -1,177 +1,86 @@
-from enum import Enum
+from TileType import TileType
+from GameStatus import GameStatus
+from GameObjects import Grid, UI
 import pygame
-import random
 
-SPRITE_SIZE = 64
-
+# GAME SETTINGS
 COLUMNS, ROWS = 9, 9
 MINE_COUNT = 10
 
-SCREEN_WIDTH = SPRITE_SIZE * COLUMNS
-SCREEN_HEIGHT = SPRITE_SIZE * ROWS
+# TILE SPRITE SETTINGS
+ORIGINAL_TILE_SPRITE_SIZE = 16
+TILE_SPRITE_SCALE = 4 if max(COLUMNS, ROWS) < 20 else 2 
+SCALED_TILE_SPRITE_SIZE = ORIGINAL_TILE_SPRITE_SIZE * TILE_SPRITE_SCALE
 
-GRID_POS_X, GRID_POS_Y = 0,0
-GRID_WIDTH, GRID_HEIGHT = SPRITE_SIZE * COLUMNS, SPRITE_SIZE * ROWS
+# COUNTER SPRITE SETTINGS
+ORIGINAL_COUNTER_SPRITE_WIDTH, ORIGINAL_COUNTER_SPRITE_HEIGHT = 13, 23
+COUNTER_SPRITE_SCALE = 2 if max(COLUMNS, ROWS) < 20 else 3
+SCALED_COUNTER_SPRITE_WIDTH, SCALED_COUNTER_SPRITE_HEIGHT = ORIGINAL_COUNTER_SPRITE_WIDTH * COUNTER_SPRITE_SCALE, ORIGINAL_COUNTER_SPRITE_HEIGHT * COUNTER_SPRITE_SCALE 
+
+# STATUS SPRITE SETTINGS
+ORIGINAL_STATUS_SPRITE_SIZE = 24
+STATUS_SPRITE_SCALE = 2 if max(COLUMNS, ROWS) < 20 else 3
+SCALED_STATUS_SPRITE_SIZE = ORIGINAL_STATUS_SPRITE_SIZE * STATUS_SPRITE_SCALE
+
+# GRID DIMENSION SETTINGS
+GRID_WIDTH, GRID_HEIGHT = SCALED_TILE_SPRITE_SIZE * COLUMNS, SCALED_TILE_SPRITE_SIZE * ROWS
+
+# UI DIMENSION SETTINGS
+UI_WIDTH, UI_HEIGHT = GRID_WIDTH, SCALED_COUNTER_SPRITE_HEIGHT * 3 if max(COLUMNS, ROWS) < 20 else SCALED_COUNTER_SPRITE_HEIGHT * 2
+UI_BORDER_PADDING_X = 0.0125
+UI_BORDER_PADDING_Y = 0.125
+UI_COUNTER_PADDING = 0.05
+
+# GRID POSITION SETTINGS
+GRID_POS_X, GRID_POS_Y = 0,UI_HEIGHT
 GRID_COLOR = (128, 128, 128)
+
+# UI POSITION SETTINGS
+UI_POS_X, UI_POS_Y = 0,0
+
+# SCREEN SETTINGS
+SCREEN_WIDTH = SCALED_TILE_SPRITE_SIZE * COLUMNS
+SCREEN_HEIGHT = SCALED_TILE_SPRITE_SIZE * ROWS + UI_HEIGHT
 
 pygame.init()
 screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 pygame.display.set_caption("Minesweeper")
 
-SPRITE = {
-    "MINE_TILE": pygame.transform.scale_by(pygame.image.load("./sprites/mine_tile.png").convert_alpha(), SPRITE_SIZE/16),
-    "FLAG_TILE": pygame.transform.scale_by(pygame.image.load("./sprites/flag_tile.png").convert_alpha(), SPRITE_SIZE/16),
-    "HIDDEN_TILE": pygame.transform.scale_by(pygame.image.load("./sprites/hidden_tile.png").convert_alpha(), SPRITE_SIZE/16),
-    "EMPTY_TILE": pygame.transform.scale_by(pygame.image.load("./sprites/empty_tile.png").convert_alpha(), SPRITE_SIZE/16),
-    "ONE_TILE": pygame.transform.scale_by(pygame.image.load("./sprites/one_tile.png").convert_alpha(), SPRITE_SIZE/16),
-    "TWO_TILE": pygame.transform.scale_by(pygame.image.load("./sprites/two_tile.png").convert_alpha(), SPRITE_SIZE/16),
-    "THREE_TILE": pygame.transform.scale_by(pygame.image.load("./sprites/three_tile.png").convert_alpha(), SPRITE_SIZE/16),
-    "FOUR_TILE": pygame.transform.scale_by(pygame.image.load("./sprites/four_tile.png").convert_alpha(), SPRITE_SIZE/16),
-    "FIVE_TILE": pygame.transform.scale_by(pygame.image.load("./sprites/five_tile.png").convert_alpha(), SPRITE_SIZE/16),
-    "SIX_TILE": pygame.transform.scale_by(pygame.image.load("./sprites/six_tile.png").convert_alpha(), SPRITE_SIZE/16),
-    "SEVEN_TILE": pygame.transform.scale_by(pygame.image.load("./sprites/seven_tile.png").convert_alpha(), SPRITE_SIZE/16),
-    "EIGHT_TILE": pygame.transform.scale_by(pygame.image.load("./sprites/eight_tile.png").convert_alpha(), SPRITE_SIZE/16)
+UI_FONT = pygame.font.SysFont('Arial', 20)
+
+TILE_SPRITES = {
+    "MINE_TILE": pygame.transform.scale_by(pygame.image.load("./sprites/mine_tile.png").convert_alpha(), TILE_SPRITE_SCALE),
+    "FLAG_TILE": pygame.transform.scale_by(pygame.image.load("./sprites/flag_tile.png").convert_alpha(), TILE_SPRITE_SCALE),
+    "HIDDEN_TILE": pygame.transform.scale_by(pygame.image.load("./sprites/hidden_tile.png").convert_alpha(), TILE_SPRITE_SCALE),
+    "EMPTY_TILE": pygame.transform.scale_by(pygame.image.load("./sprites/empty_tile.png").convert_alpha(), TILE_SPRITE_SCALE),
+    "ONE_TILE": pygame.transform.scale_by(pygame.image.load("./sprites/one_tile.png").convert_alpha(), TILE_SPRITE_SCALE),
+    "TWO_TILE": pygame.transform.scale_by(pygame.image.load("./sprites/two_tile.png").convert_alpha(), TILE_SPRITE_SCALE),
+    "THREE_TILE": pygame.transform.scale_by(pygame.image.load("./sprites/three_tile.png").convert_alpha(), TILE_SPRITE_SCALE),
+    "FOUR_TILE": pygame.transform.scale_by(pygame.image.load("./sprites/four_tile.png").convert_alpha(), TILE_SPRITE_SCALE),
+    "FIVE_TILE": pygame.transform.scale_by(pygame.image.load("./sprites/five_tile.png").convert_alpha(), TILE_SPRITE_SCALE),
+    "SIX_TILE": pygame.transform.scale_by(pygame.image.load("./sprites/six_tile.png").convert_alpha(), TILE_SPRITE_SCALE),
+    "SEVEN_TILE": pygame.transform.scale_by(pygame.image.load("./sprites/seven_tile.png").convert_alpha(), TILE_SPRITE_SCALE),
+    "EIGHT_TILE": pygame.transform.scale_by(pygame.image.load("./sprites/eight_tile.png").convert_alpha(), TILE_SPRITE_SCALE)
 }
 
-class TileType(Enum):
-    MINE = -1
-    EMPTY = 0
-    ONE = 1
-    TWO = 2
-    THREE = 3
-    FOUR = 4
-    FIVE = 5
-    SIX = 6
-    SEVEN = 7
-    EIGHT = 8
+COUNTER_SPRITES = {
+    1: pygame.transform.scale_by(pygame.image.load("./sprites/one_counter.png").convert_alpha(), COUNTER_SPRITE_SCALE),
+    2: pygame.transform.scale_by(pygame.image.load("./sprites/two_counter.png").convert_alpha(), COUNTER_SPRITE_SCALE),
+    3: pygame.transform.scale_by(pygame.image.load("./sprites/three_counter.png").convert_alpha(), COUNTER_SPRITE_SCALE),
+    4: pygame.transform.scale_by(pygame.image.load("./sprites/four_counter.png").convert_alpha(), COUNTER_SPRITE_SCALE),
+    5: pygame.transform.scale_by(pygame.image.load("./sprites/five_counter.png").convert_alpha(), COUNTER_SPRITE_SCALE),
+    6: pygame.transform.scale_by(pygame.image.load("./sprites/six_counter.png").convert_alpha(), COUNTER_SPRITE_SCALE),
+    7: pygame.transform.scale_by(pygame.image.load("./sprites/seven_counter.png").convert_alpha(), COUNTER_SPRITE_SCALE),
+    8: pygame.transform.scale_by(pygame.image.load("./sprites/eight_counter.png").convert_alpha(), COUNTER_SPRITE_SCALE),
+    9: pygame.transform.scale_by(pygame.image.load("./sprites/nine_counter.png").convert_alpha(), COUNTER_SPRITE_SCALE),
+    0: pygame.transform.scale_by(pygame.image.load("./sprites/zero_counter.png").convert_alpha(), COUNTER_SPRITE_SCALE)
+}
 
-class Tile:
-    def __init__(self, row, column):
-        self.row = row
-        self.column = column
-        self.tile_type = TileType.EMPTY
-        self.is_hidden = True
-        self.is_flagged = False
-
-class Grid():
-    def __init__(self, surface, rows, columns, width, height, global_x, global_y) -> None:
-        self.surface = surface
-        self.global_x = global_x
-        self.global_y = global_y
-        self.columns = columns
-        self.rows = rows
-        self.width = width
-        self.height = height
-        self.grid = []
-
-    def get_neighbor_tiles(self, row, column):
-        neighbors = []
-        
-        if row > 0:                                                     # UP
-            neighbors.append(self.grid[row-1][column])
-        if row < self.rows-1:                                           # DOWN
-            neighbors.append(self.grid[row+1][column])
-        if column > 0:                                                  # LEFT
-            neighbors.append(self.grid[row][column-1])
-        if column < self.columns-1:                                     # RIGHT
-            neighbors.append(self.grid[row][column+1])
-        if row > 0 and column > 0:                                      # TOP LEFT
-            neighbors.append(self.grid[row-1][column-1])
-        if row < self.rows-1 and column < self.columns-1:               # TOP RIGHT
-            neighbors.append(self.grid[row+1][column+1])
-        if row < self.rows-1 and column > 0:                            # BOTTOM LEFT
-            neighbors.append(self.grid[row+1][column-1])
-        if row > 0 and column < self.columns-1:                         # BOTTOM RIGHT
-            neighbors.append(self.grid[row-1][column+1])
-
-        return neighbors
-
-    def create_grid(self, mine_count):
-        self.grid = [[Tile(i, j) for j in range(self.columns)] for i in range(self.rows)]
-
-        mines = []
-        while len(mines) < mine_count:
-            rand_row = random.randrange(0, self.rows)
-            rand_column = random.randrange(0, self.columns)
-            rand_pos = rand_row, rand_column
-
-            if rand_pos in mines:
-                continue
-            else:
-                mines.append(rand_pos)
-                self.grid[rand_row][rand_column].tile_type = TileType.MINE
-
-        for mine in mines:
-            neighbors = self.get_neighbor_tiles(mine[0], mine[1])
-            for neighbor in neighbors:
-                if neighbor.tile_type.value >= 0:
-                    neighbor.tile_type = TileType(neighbor.tile_type.value + 1)
-
-    def draw_grid(self):
-        for row in range(self.rows):
-            for column in range(self.columns):
-                self.draw_tile(row, column)
-
-    def draw_tile(self, row, column):
-        x = self.global_x + column * SPRITE_SIZE
-        y = self.global_y + row * SPRITE_SIZE
-
-        if not self.grid[row][column].is_hidden:
-            match self.grid[row][column].tile_type:
-                case TileType.MINE:
-                    self.surface.blit(SPRITE["MINE_TILE"], (x, y))
-                case TileType.EMPTY:
-                    self.surface.blit(SPRITE["EMPTY_TILE"], (x, y))
-                case TileType.ONE:
-                    self.surface.blit(SPRITE["ONE_TILE"], (x, y))
-                case TileType.TWO:
-                    self.surface.blit(SPRITE["TWO_TILE"], (x, y))
-                case TileType.THREE:
-                    self.surface.blit(SPRITE["THREE_TILE"], (x, y))
-                case TileType.FOUR:
-                    self.surface.blit(SPRITE["FOUR_TILE"], (x, y))
-                case TileType.FIVE:
-                    self.surface.blit(SPRITE["FIVE_TILE"], (x, y))
-                case TileType.SIX:
-                    self.surface.blit(SPRITE["SIX_TILE"], (x, y))
-                case TileType.SEVEN:
-                    self.surface.blit(SPRITE["SEVEN_TILE"], (x, y))
-                case TileType.EIGHT:
-                    self.surface.blit(SPRITE["EIGHT_TILE"], (x, y))
-        else:
-            if self.grid[row][column].is_flagged:
-                self.surface.blit(SPRITE["FLAG_TILE"], (x, y))
-            else:
-                self.surface.blit(SPRITE["HIDDEN_TILE"], (x, y))
-
-    def reveal_all_tiles(self):
-        for row in range(self.rows):
-            for column in range(self.columns):
-                self.grid[row][column].is_hidden = False
-                self.grid[row][column].is_flagged = False
-                self.draw_tile(row, column)
-
-    def click_tile(self, row, column):
-        self.grid[row][column].is_hidden = False
-        self.draw_tile(row, column)
-
-        if self.grid[row][column].tile_type == TileType.MINE:
-            return self.grid[row][column].tile_type
-        elif self.grid[row][column].tile_type == TileType.EMPTY:
-            neighbors = self.get_neighbor_tiles(row, column)
-            for neighbor in neighbors:
-                if neighbor.is_hidden and not neighbor.is_flagged:
-                    if neighbor.tile_type == TileType.EMPTY and neighbor.is_hidden:
-                        self.click_tile(neighbor.row, neighbor.column)
-                    else:
-                        neighbor.is_hidden = False
-                        self.draw_tile(neighbor.row, neighbor.column)
-        
-        return self.grid[row][column].tile_type
-
-    def flag_tile(self, row, column):
-        self.grid[row][column].is_flagged = not self.grid[row][column].is_flagged
-        self.draw_tile(row, column)
+STATUS_SPRITES = {
+    "PLAYING": pygame.transform.scale_by(pygame.image.load("./sprites/status_playing.png").convert_alpha(), STATUS_SPRITE_SCALE),
+    "WIN": pygame.transform.scale_by(pygame.image.load("./sprites/status_win.png").convert_alpha(), STATUS_SPRITE_SCALE),
+    "DEAD": pygame.transform.scale_by(pygame.image.load("./sprites/status_dead.png").convert_alpha(), STATUS_SPRITE_SCALE)
+}
 
 def get_clicked_tile(mouse_x, mouse_y):
     row = (mouse_y - GRID_POS_Y) // (GRID_HEIGHT / ROWS)
@@ -179,22 +88,38 @@ def get_clicked_tile(mouse_x, mouse_y):
 
     return int(row), int(column)
 
-if __name__ == "__main__":
-    is_game_over = False
-
-    grid = Grid(screen, ROWS, COLUMNS, GRID_WIDTH, GRID_HEIGHT, GRID_POS_X, GRID_POS_Y)
+def create_new_game():
+    game_status = GameStatus.PLAYING
+    grid = Grid(screen, ROWS, COLUMNS, GRID_WIDTH, GRID_HEIGHT, GRID_POS_X, GRID_POS_Y, SCALED_TILE_SPRITE_SIZE, TILE_SPRITES)
     grid.create_grid(MINE_COUNT)
     grid.draw_grid()
 
-    is_running = True
-    while is_running:
+    ui = UI(screen, UI_WIDTH, UI_HEIGHT, UI_POS_X, UI_POS_Y, UI_BORDER_PADDING_X, UI_BORDER_PADDING_Y, UI_COUNTER_PADDING, SCALED_COUNTER_SPRITE_HEIGHT, SCALED_COUNTER_SPRITE_WIDTH, COUNTER_SPRITES, SCALED_STATUS_SPRITE_SIZE, STATUS_SPRITES, MINE_COUNT)
+    ui.draw()
 
+    return game_status, grid, ui
+
+if __name__ == "__main__":
+    is_running = True
+
+    game_status, grid, ui = create_new_game()
+    
+    while is_running:
         for event in pygame.event.get():
+            if grid.unhidden_tiles == (COLUMNS * ROWS) - MINE_COUNT:
+                game_status = GameStatus.WIN
+                ui.update_status(game_status)
+                grid.reveal_all_tiles()
+
             if event.type == pygame.QUIT:
                 is_running = False
-        
+
             if event.type == pygame.MOUSEBUTTONDOWN:
                 mouse_x, mouse_y = pygame.mouse.get_pos()
+
+                if mouse_x > UI_POS_X + (UI_WIDTH/2 - SCALED_STATUS_SPRITE_SIZE/2) and mouse_y > UI_POS_Y + (UI_HEIGHT/2 - SCALED_STATUS_SPRITE_SIZE/2):
+                    if mouse_x < UI_POS_X + (UI_WIDTH/2 - SCALED_STATUS_SPRITE_SIZE/2) + SCALED_STATUS_SPRITE_SIZE and mouse_y < UI_POS_Y + (UI_HEIGHT/2 - SCALED_STATUS_SPRITE_SIZE/2) + GRID_HEIGHT:
+                        game_status, grid, ui = create_new_game()
 
                 if mouse_x > GRID_POS_X and mouse_y > GRID_POS_Y:
                     if mouse_x < GRID_POS_X + GRID_WIDTH and mouse_y < GRID_POS_Y + GRID_HEIGHT:
@@ -204,11 +129,19 @@ if __name__ == "__main__":
                             if grid.grid[row][column].is_hidden: 
                                 clicked_tile = grid.click_tile(row, column)
                                 if clicked_tile == TileType.MINE:
+                                    game_status = GameStatus.DEAD
+                                    ui.update_status(game_status)
                                     grid.reveal_all_tiles()
 
                         elif event.button == 3:
                             row, column = get_clicked_tile(mouse_x, mouse_y)
-                            if grid.grid[row][column].is_hidden: grid.flag_tile(row, column)
+                            if grid.grid[row][column].is_hidden:
+                                if grid.grid[row][column].is_flagged:
+                                    grid.flag_tile(row, column)
+                                    ui.update_counter(+1)
+                                elif ui.flag_counter.count > 0:
+                                    grid.flag_tile(row, column)
+                                    ui.update_counter(-1)
 
         pygame.display.update()
 

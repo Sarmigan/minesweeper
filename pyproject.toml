@@ -7,9 +7,12 @@ license = "GNU GPL"
 readme = "README.md"
 
 [tool.poetry.dependencies]
-python = "^3.11"
+python = ">=3.11,<3.13"
 pygame = "^2.5.2"
 
+
+[tool.poetry.group.dev.dependencies]
+pyinstaller = "^6.3.0"
 
 [build-system]
 requires = ["poetry-core"]
