@@ -114,7 +114,7 @@ if __name__ == "__main__":
             if event.type == pygame.QUIT:
                 is_running = False
 
-            if event.type == pygame.MOUSEBUTTONDOWN:
+            if event.type == pygame.MOUSEBUTTONUP:
                 mouse_x, mouse_y = pygame.mouse.get_pos()
 
                 if mouse_x > UI_POS_X + (UI_WIDTH/2 - SCALED_STATUS_SPRITE_SIZE/2) and mouse_y > UI_POS_Y + (UI_HEIGHT/2 - SCALED_STATUS_SPRITE_SIZE/2):

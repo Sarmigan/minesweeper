@@ -162,23 +162,32 @@ class UI():
         self.flag_counter.count = mine_count
 
     def draw(self):
-        ui_top_left = (self.global_x + self.border_padding_x, self.global_y + self.border_padding_y)
-        ui_top_right = (self.global_x + self.width - self.border_padding_x, self.global_y + self.border_padding_y)
-        ui_bottom_left = (self.global_x + self.border_padding_x, self.global_y + self.height - self.border_padding_y)
-        ui_bottom_right = (self.global_x + self.width - self.border_padding_x, self.global_y + self.height - self.border_padding_y)
+        ui_border_top_left = (self.global_x + self.border_padding_x, self.global_y + self.border_padding_y)
+        ui_border_top_right = (self.global_x + self.width - self.border_padding_x, self.global_y + self.border_padding_y)
+        ui_border_bottom_left = (self.global_x + self.border_padding_x, self.global_y + self.height - self.border_padding_y)
+        ui_border_bottom_right = (self.global_x + self.width - self.border_padding_x, self.global_y + self.height - self.border_padding_y)
+
+        counter_top_left = (self.global_x + self.counter_padding-1, self.global_y + (self.height/2 - self.counter_sprite_height/2)-1)
+        counter_bottom_left = (self.global_x + self.counter_padding-1, self.global_y + (self.height/2 - self.counter_sprite_height/2)+self.counter_sprite_height+1)
+        counter_top_right = (self.global_x + self.counter_padding+self.counter_sprite_width*3+1, self.global_y + (self.height/2 - self.counter_sprite_height/2)-1)
+        counter_bottom_right = (self.global_x + self.counter_padding+self.counter_sprite_width*3+1, self.global_y + (self.height/2 - self.counter_sprite_height/2)+self.counter_sprite_height+1)
 
         # Draw UI background
         pygame.draw.rect(self.surface, (192, 192, 192), (self.global_x, self.global_y, self.width, self.height))
-        pygame.draw.line(self.surface, (128, 128, 128), ui_top_left, ui_top_right, 6)
-        pygame.draw.line(self.surface, (128, 128, 128), ui_top_left, ui_bottom_left, 6)
-        pygame.draw.line(self.surface, (255, 255, 255), ui_bottom_right, ui_bottom_left, 6)
-        pygame.draw.line(self.surface, (255, 255, 255), ui_top_right, ui_bottom_right, 6)
+        pygame.draw.line(self.surface, (128, 128, 128), ui_border_top_left, ui_border_top_right, 6)
+        pygame.draw.line(self.surface, (128, 128, 128), ui_border_top_left, ui_border_bottom_left, 6)
+        pygame.draw.line(self.surface, (255, 255, 255), ui_border_bottom_right, ui_border_bottom_left, 6)
+        pygame.draw.line(self.surface, (255, 255, 255), ui_border_top_right, ui_border_bottom_right, 6)
 
         # Draw counter
         counter_x = self.global_x + self.counter_padding
         counter_y = self.global_y + (self.height/2 - self.counter_sprite_height/2)
         for i, digit in enumerate(utils.get_digits(self.flag_counter.count)):
             self.surface.blit(self.counter_sprites[digit], (counter_x + self.counter_sprite_width * i, counter_y + self.global_y))
+        pygame.draw.line(self.surface, (128, 128, 128), counter_top_left, counter_top_right, 3)
+        pygame.draw.line(self.surface, (128, 128, 128), counter_top_left, counter_bottom_left, 3)
+        pygame.draw.line(self.surface, (255, 255, 255), counter_bottom_right, counter_bottom_left, 3)
+        pygame.draw.line(self.surface, (255, 255, 255), counter_top_right, counter_bottom_right, 3)
 
         # Draw status
         status_x = self.global_x + (self.width/2 - self.status_sprite_size/2)
