@@ -1,5 +1,5 @@
-from TileType import TileType
-from game_objects.Tile import Tile
+from minesweeper.custom_enums.TileType import TileType
+from minesweeper.game_objects.Tile import Tile
 import random
 
 class Grid():

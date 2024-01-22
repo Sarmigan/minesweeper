@@ -1,18 +1,14 @@
 [tool.poetry]
 name = "minesweeper"
 version = "0.1.0"
-description = "Minesweeper in Python"
+description = ""
 authors = ["Your Name <you@example.com>"]
-license = "GNU GPL"
 readme = "README.md"
 
 [tool.poetry.dependencies]
-python = ">=3.11,<3.13"
-pygame = "^2.5.2"
+python = "^3.11"
+pygame-2048 = "^1.9.4"
 
-
-[tool.poetry.group.dev.dependencies]
-pyinstaller = "^6.3.0"
 
 [build-system]
 requires = ["poetry-core"]

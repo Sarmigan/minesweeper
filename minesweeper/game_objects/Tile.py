@@ -1,4 +1,4 @@
-from TileType import TileType
+from minesweeper.custom_enums.TileType import TileType
 
 class Tile:
     def __init__(self, row, column):

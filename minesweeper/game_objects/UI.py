@@ -1,6 +1,6 @@
-from GameStatus import GameStatus
-from game_objects.Counter import Counter
-import utils
+from minesweeper.custom_enums.GameStatus import GameStatus
+from minesweeper.game_objects.Counter import Counter
+from minesweeper.utils import get_digits
 import pygame
 
 class UI():
@@ -44,8 +44,8 @@ class UI():
         # Draw counter
         counter_x = self.global_x + self.counter_padding
         counter_y = self.global_y + (self.height/2 - self.counter_sprite_height/2)
-        for i, digit in enumerate(utils.get_digits(self.flag_counter.count)):
-            self.surface.blit(self.counter_sprites[digit], (counter_x + self.counter_sprite_width * i, counter_y + self.global_y))
+        for i, digit in enumerate(get_digits(self.flag_counter.count)):
+            self.surface.blit(self.counter_sprites[digit], (counter_x + self.counter_sprite_width * i, counter_y))
         pygame.draw.line(self.surface, (128, 128, 128), counter_top_left, counter_top_right, 3)
         pygame.draw.line(self.surface, (128, 128, 128), counter_top_left, counter_bottom_left, 3)
         pygame.draw.line(self.surface, (255, 255, 255), counter_bottom_right, counter_bottom_left, 3)
@@ -56,7 +56,6 @@ class UI():
         status_y = self.global_y + (self.height/2 - self.status_sprite_size/2)
         self.surface.blit(self.status_sprites[self.game_status.value], (status_x, status_y))
         
-
     def update_counter(self, val):
         self.flag_counter.count += val
         self.draw()
