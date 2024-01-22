@@ -1,6 +1,7 @@
-from TileType import TileType
-from GameStatus import GameStatus
-from GameObjects import Grid, UI
+from custom_enums.TileType import TileType
+from custom_enums.GameStatus import GameStatus
+from game_objects.Grid import Grid
+from game_objects.UI import UI
 import pygame
 
 # GAME SETTINGS
