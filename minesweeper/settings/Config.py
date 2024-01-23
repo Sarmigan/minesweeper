@@ -1,8 +1,8 @@
 class Config():
     def __init__(self,
-                 COLUMNS=9,
-                 ROWS=9,
-                 MINE_COUNT=10,
+                 COLUMNS,
+                 ROWS,
+                 MINE_COUNT,
                  ORIGINAL_TILE_SPRITE_SIZE=16,
                  ORIGINAL_COUNTER_SPRITE_WIDTH=13,
                  ORIGINAL_COUNTER_SPRITE_HEIGHT=23,
@@ -16,23 +16,7 @@ class Config():
                  UI_POS_X=0,
                  MENU_POS_X=0,
                  MENU_POS_Y=0,
-                 MENU_COLOR=(236, 233, 216),
-                 DIFFICULTIES=[
-                                {
-                                    "rows": 9,
-                                    "columns": 9,
-                                    "mine_count": 10
-                                },
-                                {
-                                    "rows": 16,
-                                    "columns": 16,
-                                    "mine_count": 40
-                                },
-                                {
-                                    "rows": 16,
-                                    "columns": 30,
-                                    "mine_count": 99
-                                }]):
+                 MENU_COLOR=(236, 233, 216)):
         
         # GAME SETTINGS
         self.COLUMNS, self.ROWS = COLUMNS, ROWS
@@ -85,6 +69,3 @@ class Config():
         # SCREEN SETTINGS
         self.SCREEN_WIDTH = self.GRID_WIDTH
         self.SCREEN_HEIGHT = self.GRID_HEIGHT + self.UI_HEIGHT + self.MENU_HEIGHT
-
-        # DIFFICULTY SETTINGS
-        self.DIFFICULTIES = DIFFICULTIES

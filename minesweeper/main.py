@@ -4,7 +4,8 @@ from minesweeper.game_objects.Grid import Grid
 from minesweeper.game_objects.UI import UI
 from minesweeper.game_objects.Menu import Menu
 from minesweeper.utils import load_tile_sprites, load_counter_sprites, load_status_sprites, load_menu_sprites
-from Config import Config
+from minesweeper.settings.Config import Config
+from minesweeper.settings.Difficulties import DIFFICULTIES
 import pygame
 
 def is_click_menu(mouse_x, mouse_y):
@@ -43,7 +44,7 @@ def create_new_game(config, screen):
     STATUS_SPRITES = load_status_sprites(config)
 
     MENU_SPRITES = load_menu_sprites(config)
-    
+
     game_status = GameStatus.PLAYING
 
     grid = Grid(screen,
@@ -87,7 +88,9 @@ def create_new_game(config, screen):
     return game_status, grid, ui
 
 if __name__ == "__main__":
-    config = Config()
+    config = Config(COLUMNS=DIFFICULTIES[0]["columns"],
+                    ROWS=DIFFICULTIES[0]["rows"],
+                    MINE_COUNT=DIFFICULTIES[0]["mine_count"])
     pygame.init()
     pygame.display.set_caption("Minesweeper")
     screen = pygame.display.set_mode((config.SCREEN_WIDTH, config.SCREEN_HEIGHT))
@@ -120,15 +123,14 @@ if __name__ == "__main__":
                 if is_click_menu(mouse_x, mouse_y):
                     clicked_menu_index = get_clicked_menu(mouse_x)
                     if clicked_menu_index < len(MENU_SPRITES.keys()):
-                        config = Config(COLUMNS=config.DIFFICULTIES[clicked_menu_index]["columns"],
-                                        ROWS=config.DIFFICULTIES[clicked_menu_index]["rows"],
-                                        MINE_COUNT=config.DIFFICULTIES[clicked_menu_index]["mine_count"])
+                        config = Config(COLUMNS=DIFFICULTIES[clicked_menu_index]["columns"],
+                                        ROWS=DIFFICULTIES[clicked_menu_index]["rows"],
+                                        MINE_COUNT=DIFFICULTIES[clicked_menu_index]["mine_count"])
 
                         screen = pygame.display.set_mode((config.SCREEN_WIDTH, config.SCREEN_HEIGHT))
                         game_status, grid, ui = create_new_game(config, screen)
 
                 if is_click_status(mouse_x, mouse_y):
-                    screen = pygame.display.set_mode((config.SCREEN_WIDTH, config.SCREEN_HEIGHT))
                     game_status, grid, ui = create_new_game(config, screen)
 
                 if is_click_grid(mouse_x, mouse_y):
