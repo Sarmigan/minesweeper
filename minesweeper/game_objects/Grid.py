@@ -109,7 +109,7 @@ class Grid():
         self.draw_tile(row, column)
 
         if self.grid[row][column].tile_type == TileType.MINE:
-            return self.grid[row][column].tile_type
+            return self.grid[row][column]
         elif self.grid[row][column].tile_type == TileType.EMPTY:
             neighbors = self.get_neighbor_tiles(row, column)
             for neighbor in neighbors:
@@ -121,7 +121,7 @@ class Grid():
                         neighbor.is_hidden = False
                         self.draw_tile(neighbor.row, neighbor.column)
         
-        return self.grid[row][column].tile_type
+        return self.grid[row][column]
 
     def flag_tile(self, row, column):
         self.grid[row][column].is_flagged = not self.grid[row][column].is_flagged

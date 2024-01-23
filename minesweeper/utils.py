@@ -43,3 +43,10 @@ def load_status_sprites(config):
         "WIN": pygame.transform.scale_by(pygame.image.load("minesweeper/resources/sprites/status_win.png").convert_alpha(), config.STATUS_SPRITE_SCALE),
         "DEAD": pygame.transform.scale_by(pygame.image.load("minesweeper/resources/sprites/status_dead.png").convert_alpha(), config.STATUS_SPRITE_SCALE)
     }
+
+def load_menu_sprites(config):
+    return {
+        "BEGINNER": pygame.transform.scale_by(pygame.image.load("minesweeper/resources/sprites/menu_beginner.png").convert_alpha(), config.MENU_SPRITE_SCALE),
+        "INTERMEDIATE": pygame.transform.scale_by(pygame.image.load("minesweeper/resources/sprites/menu_intermediate.png").convert_alpha(), config.MENU_SPRITE_SCALE),
+        "EXPERT": pygame.transform.scale_by(pygame.image.load("minesweeper/resources/sprites/menu_expert.png").convert_alpha(), config.MENU_SPRITE_SCALE)
+    }
