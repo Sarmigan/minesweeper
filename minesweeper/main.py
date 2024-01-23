@@ -122,6 +122,7 @@ if __name__ == "__main__":
 
                 if is_click_menu(mouse_x, mouse_y):
                     clicked_menu_index = get_clicked_menu(mouse_x)
+                    
                     if clicked_menu_index < len(MENU_SPRITES.keys()):
                         config = Config(COLUMNS=DIFFICULTIES[clicked_menu_index]["columns"],
                                         ROWS=DIFFICULTIES[clicked_menu_index]["rows"],
