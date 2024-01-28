@@ -16,7 +16,7 @@ class Config():
                  UI_POS_X=0,
                  MENU_POS_X=0,
                  MENU_POS_Y=0,
-                 MENU_COLOR=(236, 233, 216)):
+                 MENU_COLOR=(192, 192, 192)):
         
         # GAME SETTINGS
         self.COLUMNS, self.ROWS = COLUMNS, ROWS
